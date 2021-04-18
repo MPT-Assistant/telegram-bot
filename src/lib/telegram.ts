@@ -10,6 +10,11 @@ const telegram = new Telegram({
 	token: InternalUtils.config.telegram.token,
 });
 
+telegram.updates.use((context, next) => {
+	console.log(context);
+	next();
+});
+
 telegram.updates.on(
 	"message",
 	async function MessageHandler(message: ModernMessageContext) {
