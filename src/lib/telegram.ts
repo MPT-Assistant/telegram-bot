@@ -44,21 +44,23 @@ telegram.updates.on(
 					return 0;
 				});
 				const text = `\nВозможно вы имели в виду какую то из этих команд:\n1. ${possibleCommands[0].template}\n2. ${possibleCommands[1].template}\n3. ${possibleCommands[2].template}`;
-				return await message.send(text);
+				return await message.reply(text);
 			}
 			return;
 		}
 
-		message.db.user = await new User(
-			message.from?.id,
-			message.from?.username || message.from?.firstName,
-		).init();
+		message.db = {
+			user: await new User(
+				message.from?.id,
+				message.from?.username || message.from?.firstName,
+			).init(),
+		};
 
 		if (message.db.user.data.ban === true) {
 			return;
 		}
 
-		if (message.chat) {
+		if (message.chat && !message.isPM) {
 			message.db.chat = new Chat(message.chat.id);
 		}
 
