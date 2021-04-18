@@ -1,0 +1,5 @@
+/dist/
+/node_modules/
+/src/DB/config.json
+/test.*
+yarn.lock

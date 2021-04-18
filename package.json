@@ -1,0 +1,20 @@
+{
+	"name": "mpt-assistant-telegram-bot",
+	"version": "1.0.0",
+	"main": "./dist/main.js",
+	"repository": "https://github.com/MPT-Assistant/telegram-bot",
+	"author": "rus_anonym <alexandrsemin2033@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"start": "npm run build && cd dist && node main.js",
+		"build": "tsc",
+		"lint": "eslint ./src --ext .ts"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^4.20.0",
+		"@typescript-eslint/parser": "^4.20.0",
+		"eslint": "^7.23.0",
+		"typescript": "^4.2.3"
+	}
+}
