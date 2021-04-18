@@ -44,7 +44,6 @@ const DumpSchema = createSchema({
 
 const UserSchema = createSchema({
 	id: Type.number({ required: true, unique: true }),
-	nickname: Type.string({ required: true }),
 	ban: Type.boolean({ required: true }),
 	group: Type.string({ required: true }),
 	inform: Type.boolean({ required: true }),
