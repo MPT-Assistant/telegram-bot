@@ -11,6 +11,8 @@ telegram.updates.on("message", async function MessageHandler(message) {
 		return;
 	}
 
+	message.send
+
 	console.log(message);
 });
 

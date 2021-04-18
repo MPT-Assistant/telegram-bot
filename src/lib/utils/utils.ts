@@ -3,6 +3,7 @@ import * as DB from "./DB";
 import Logger from "./logger";
 
 import config from "../../DB/config.json";
+import TextCommand from "./textCommand";
 
 class Utils {
 	public logger = new Logger();
@@ -21,6 +22,8 @@ class Utils {
 		password: config.mongo.password,
 		database: "telegram",
 	});
+
+	public textCommands: TextCommand[] = [];
 
 	public config = config;
 	public textCommandsTemplates: string[] = [];
