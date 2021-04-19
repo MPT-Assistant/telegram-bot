@@ -7,7 +7,7 @@ class Logger {
 	private telegram = new Telegram({ token: config.telegram.token });
 	public sendLog(text: string): Promise<TelegramMessage> {
 		return this.telegram.api.sendMessage({
-			chat_id: "@rus_anonym",
+			chat_id: "455854221",
 			text,
 		});
 	}
