@@ -4,3 +4,4 @@ import "./MPT/replacements";
 import "./MPT/regchat";
 
 import "./utils/about";
+import "./utils/chat";
