@@ -3,7 +3,8 @@ import { Interval } from "simple-scheduler-task";
 
 import telegram from "./telegram";
 
-import "../commands/loader";
+import "../commands/textCommands/loader";
+import "../commands/callbackCommands/loader";
 
 new Interval(async () => {
 	await InternalUtils.mpt.getLastDump();

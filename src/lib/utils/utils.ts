@@ -4,6 +4,7 @@ import Logger from "./logger";
 
 import config from "../../DB/config.json";
 import TextCommand from "./textCommand";
+import CallbackCommand from "./callbackCommand";
 
 class Utils {
 	public logger = new Logger();
@@ -24,6 +25,7 @@ class Utils {
 	});
 
 	public textCommands: TextCommand[] = [];
+	public callbackCommands: CallbackCommand[] = [];
 
 	public config = config;
 	public textCommandsTemplates: string[] = [];

@@ -1,4 +1,9 @@
-import { ModernMessageContext } from "./../typings/message";
+import queryString from "query-string";
+
+import {
+	ModernCallbackQueryContext,
+	ModernMessageContext,
+} from "./../typings/message";
 import { Telegram } from "puregram";
 
 import InternalUtils from "./utils/utils";
@@ -16,10 +21,74 @@ telegram.updates.use((context, next) => {
 });
 
 telegram.updates.on(
+	"callback_query",
+	async function CallbackHandler(context: ModernCallbackQueryContext) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
+		context.query = queryString.parse(context.queryPayload);
+
+		const notFoundCommand = () => {
+			return context.answerCallbackQuery({
+				text: "Не обнаружено такой команды",
+				show_alert: true,
+			});
+		};
+
+		if (!context.query.com || !context.message) {
+			return await notFoundCommand();
+		}
+
+		const command = InternalUtils.callbackCommands.find((command) =>
+			command.check(context.query.com),
+		);
+
+		if (!command) {
+			return await notFoundCommand();
+		}
+
+		context.db = {
+			user: await new User(
+				context.from?.id,
+				context.from?.username || context.from?.firstName,
+			).init(),
+		};
+
+		if (context.db.user.data.ban === true) {
+			return;
+		}
+
+		if (context.message.chat && !context.message.isPM) {
+			context.db.chat = await new Chat(context.message.chat.id).init();
+		}
+
+		context.sendMessage = async (text, params?) => {
+			try {
+				return await context.message?.reply(
+					`${context.db.user.username}, ${text}`,
+					params,
+				);
+			} catch (error) {
+				return error;
+			}
+		};
+
+		try {
+			await command.process(context);
+			await context.db.user.save();
+			if (context.db.chat) {
+				context.db.chat.save();
+			}
+			return;
+		} catch (err) {
+			console.log(err);
+			await context.sendMessage(`ошиб очка.`);
+		}
+	},
+);
+
+telegram.updates.on(
 	"message",
 	async function MessageHandler(message: ModernMessageContext) {
-		console.log(message);
-
 		if (message.from?.isBot || !message.text || !message.from?.id) {
 			return;
 		}
@@ -66,7 +135,7 @@ telegram.updates.on(
 		}
 
 		if (message.chat && !message.isPM) {
-			message.db.chat = new Chat(message.chat.id);
+			message.db.chat = await new Chat(message.chat.id).init();
 		}
 
 		message.sendMessage = async (text, params?) => {

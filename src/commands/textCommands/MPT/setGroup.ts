@@ -1,12 +1,9 @@
-import TextCommand from "../../lib/utils/textCommand";
-import InternalUtils from "../../lib/utils/utils";
+import TextCommand from "../../../lib/utils/textCommand";
+import InternalUtils from "../../../lib/utils/utils";
 
 import utils from "rus-anonym-utils";
 import { InlineKeyboard } from "puregram";
-import {
-	InlineKeyboardSwitchToCurrentChatButton,
-	InlineKeyboardTextButton,
-} from "puregram/lib/interfaces";
+import { InlineKeyboardTextButton } from "puregram/lib/interfaces";
 
 new TextCommand(
 	/(?:установить группу|уг)(?:\s(.*))?$/i,
@@ -43,13 +40,13 @@ new TextCommand(
 				return 0;
 			});
 			let responseText = `\nВозможно вы имели в виду какую то из этих групп:`;
-			const responseKeyboard: InlineKeyboardSwitchToCurrentChatButton[] = [];
+			const responseKeyboard: InlineKeyboardTextButton[] = [];
 			for (let i = 0; i < 3; i++) {
 				responseText += `\n${i + 1}. ${diff[i].group}`;
 				responseKeyboard.push(
-					InlineKeyboard.switchToCurrentChatButton({
+					InlineKeyboard.textButton({
 						text: diff[i].group,
-						query: `уг ${diff[i].group}`,
+						payload: `com=setGroup&group=${diff[i].group}`,
 					}),
 				);
 			}
