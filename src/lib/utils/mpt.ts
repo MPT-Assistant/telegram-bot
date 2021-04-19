@@ -1,3 +1,4 @@
+import { InlineKeyboard } from "puregram";
 import moment from "moment";
 import "moment-precise-range-plugin";
 
@@ -13,6 +14,7 @@ import {
 	Group,
 } from "../../typings/mpt";
 import utils from "./utils";
+import { InlineKeyboardTextButton } from "puregram/lib/interfaces";
 
 type MPT_Data = {
 	week: Week;
@@ -233,5 +235,91 @@ export default class MPT {
 		} else {
 			return this.isDenominator ? "Числитель" : "Знаменатель";
 		}
+	}
+
+	public generateKeyboard(
+		command: "lessons" | "replacements",
+	): InlineKeyboardTextButton[][] {
+		const DayTemplates: RegExp[] = [
+			/воскресенье|вс/,
+			/понедельник|пн/,
+			/вторник|вт/,
+			/среда|ср/,
+			/четверг|чт/,
+			/пятница|пт/,
+			/суббота|сб/,
+		];
+
+		const getNextSelectDay = (
+			day:
+				| "понедельник"
+				| "вторник"
+				| "среда"
+				| "четверг"
+				| "пятница"
+				| "суббота"
+				| "воскресенье",
+		) => {
+			const selectedDay = DayTemplates.findIndex((x) => x.test(day));
+			const currentDate = new Date();
+			const targetDay = Number(selectedDay);
+			const targetDate = new Date();
+			const delta = targetDay - currentDate.getDay();
+			if (delta >= 0) {
+				targetDate.setDate(currentDate.getDate() + delta);
+			} else {
+				targetDate.setDate(currentDate.getDate() + 7 + delta);
+			}
+			return moment(targetDate).format("DD.MM.YYYY");
+		};
+
+		const responseKeyboard: InlineKeyboardTextButton[][] = [];
+
+		responseKeyboard.push([
+			InlineKeyboard.textButton({
+				text: "ПН",
+				payload: `com=${command}&date=${getNextSelectDay("понедельник")}`,
+			}),
+			InlineKeyboard.textButton({
+				text: "ВТ",
+				payload: `com=${command}&date=${getNextSelectDay("вторник")}`,
+			}),
+			InlineKeyboard.textButton({
+				text: "СР",
+				payload: `com=${command}&date=${getNextSelectDay("среда")}`,
+			}),
+		]);
+
+		responseKeyboard.push([
+			InlineKeyboard.textButton({
+				text: "ЧТ",
+				payload: `com=${command}&date=${getNextSelectDay("четверг")}`,
+			}),
+			InlineKeyboard.textButton({
+				text: "ПТ",
+				payload: `com=${command}&date=${getNextSelectDay("пятница")}`,
+			}),
+			InlineKeyboard.textButton({
+				text: "СБ",
+				payload: `com=${command}&date=${getNextSelectDay("суббота")}`,
+			}),
+		]);
+
+		responseKeyboard.push([
+			InlineKeyboard.textButton({
+				text: "Вчера",
+				payload: `com=${command}&date=${moment()
+					.add(1, "day")
+					.format("DD.MM.YYYY")}`,
+			}),
+			InlineKeyboard.textButton({
+				text: "Вчера",
+				payload: `com=${command}&date=${moment()
+					.subtract(1, "day")
+					.format("DD.MM.YYYY")}`,
+			}),
+		]);
+
+		return responseKeyboard;
 	}
 }
