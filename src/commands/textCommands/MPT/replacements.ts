@@ -1,12 +1,11 @@
-import { InlineKeyboard } from "puregram";
 import moment from "moment";
+import { InlineKeyboard } from "puregram";
 import utils from "rus-anonym-utils";
 
 moment.locale("ru");
 
 import TextCommand from "../../../lib/utils/textCommand";
 import InternalUtils from "../../../lib/utils/utils";
-import { Day, Specialty, Group } from "../../../typings/mpt";
 
 const DayTemplates: RegExp[] = [
 	/воскресенье|вс/,
@@ -19,9 +18,9 @@ const DayTemplates: RegExp[] = [
 ];
 
 new TextCommand(
-	/^(?:расписание|рп|какие пары)(?:\s(.+))?$/i,
-	["Расписание", "Рп"],
-	async function LessonsCommand(message) {
+	/^(?:замены на|замены)(?:\s(.+))?$/i,
+	["Замены"],
+	async function ReplacementsCommand(message) {
 		if (
 			(message.db.chat &&
 				message.db.chat.data.group === "" &&
@@ -69,14 +68,14 @@ new TextCommand(
 				break;
 			case /([\d]+)?(.)?([\d]+)?(.)?([\d]+)/.test(message.args[1]): {
 				const splittedMessageArgument = message.args[1].split(".");
-				const currentSplittedDate = moment().format("DD.MM.YYYY");
+				const currentSplittedDate = moment().format("DD.MM.YYYY").split(".");
 				splittedMessageArgument[0] =
 					splittedMessageArgument[0] || currentSplittedDate[0];
 				splittedMessageArgument[1] =
 					splittedMessageArgument[1] || currentSplittedDate[1];
 				splittedMessageArgument[2] =
 					splittedMessageArgument[2] || currentSplittedDate[2];
-				selectedDate = moment(splittedMessageArgument.reverse().join("-"));
+				selectedDate = moment(splittedMessageArgument.join("."), "DD.MM.YYYY");
 				break;
 			}
 			default:
@@ -98,7 +97,7 @@ new TextCommand(
 				break;
 		}
 
-		const responseKeyboard = InternalUtils.mpt.generateKeyboard("lessons");
+		const responseKeyboard = InternalUtils.mpt.generateKeyboard("replacements");
 
 		if (!selectedDate || !selectedDate.isValid()) {
 			return await message.sendMessage(`неверная дата.`, {
@@ -107,96 +106,59 @@ new TextCommand(
 		}
 
 		if (selectedDate.day() === 0) {
-			if (!message.args[1]) {
-				selectedDate.add(1, "day");
-			} else {
-				return await message.sendMessage(
-					`${selectedDate.format("DD.MM.YYYY")} воскресенье.`,
-					{ reply_markup: InlineKeyboard.keyboard(responseKeyboard) },
-				);
-			}
-		}
-
-		const parsedTimetable = InternalUtils.mpt.parseTimetable(selectedDate);
-
-		const selectSpecialty = InternalUtils.mpt.data.schedule.find(
-			(specialty) => specialty.name === groupData.specialty,
-		) as Specialty;
-
-		const selectGroup = selectSpecialty.groups.find(
-			(group) => group.name === groupData.name,
-		) as Group;
-
-		if (!message.args[1]) {
-			const selectedDayNum = selectedDate.day();
-			const selectDaySchedule = selectGroup.days.find(
-				(day) => day.num === selectedDayNum,
-			) as Day;
-
-			const lastLessonNum =
-				selectDaySchedule.lessons[selectDaySchedule.lessons.length - 1].num;
-
-			if (
-				parsedTimetable.find(
-					(x) => x.num === lastLessonNum && x.type === "lesson",
-				)?.status === "finished"
-			) {
-				if (selectedDayNum + 1 === 7) {
-					selectedDate.add(2, "day");
-				} else {
-					selectedDate.add(1, "day");
-				}
-			}
-		}
-
-		const parsedSchedule = InternalUtils.mpt.parseSchedule(
-			groupData,
-			selectedDate,
-		);
-
-		if (parsedSchedule.replacementsCount !== 0) {
-			responseKeyboard.push([
-				InlineKeyboard.textButton({
-					text: "Замены",
-					payload: `com=replacements&date=${selectedDate.format("DD.MM.YYYY")}`,
-				}),
-			]);
-		}
-
-		let responseLessonsText = "\n";
-
-		for (const lesson of parsedSchedule.lessons) {
-			const lessonDateData = parsedTimetable.find(
-				(x) => x.num === lesson.num && x.type === "lesson",
+			return await message.sendMessage(
+				`${selectedDate.format("DD.MM.YYYY")} воскресенье.`,
+				{ reply_markup: InlineKeyboard.keyboard(responseKeyboard) },
 			);
-			responseLessonsText += `${
-				lessonDateData
-					? lessonDateData.start.format("HH:mm:ss") +
-					  " - " +
-					  lessonDateData.end.format("HH:mm:ss")
-					: ""
-			}\n${lesson.num}. ${lesson.name} (${lesson.teacher})\n\n`;
 		}
 
-		const selectedDayName = selectedDate.format("dddd").split("");
-		selectedDayName[0] = selectedDayName[0].toUpperCase();
-
-		return await message.sendMessage(
-			`расписание на ${selectedDate.format("DD.MM.YYYY")}:
-Группа: ${groupData.name}
-День: ${selectedDayName.join("")}
-Место: ${parsedSchedule.place}
-Неделя: ${parsedSchedule.week}
-${responseLessonsText}
-${
-	parsedSchedule.replacementsCount > 0
-		? `\nВнимание:\nНа выбранный день есть ${utils.string.declOfNum(
-				parsedSchedule.replacementsCount,
-				["замена", "замены", "замены"],
-		  )}.\nПросмотреть текущие замены можно командой "замены".`
-		: ""
-}`,
-			{ reply_markup: InlineKeyboard.keyboard(responseKeyboard) },
+		const selectDayReplacements = InternalUtils.mpt.data.replacements.filter(
+			(replacement) =>
+				replacement.group.toLowerCase() === groupData.name.toLowerCase() &&
+				moment(replacement.date).format("DD.MM.YYYY") ===
+					selectedDate?.format("DD.MM.YYYY"),
 		);
+
+		if (selectDayReplacements.length === 0) {
+			return await message.sendMessage(
+				`на выбранный день (${selectedDate.format(
+					"DD.MM.YYYY",
+				)}) замен для группы ${groupData.name} не найдено.`,
+				{ reply_markup: InlineKeyboard.keyboard(responseKeyboard) },
+			);
+		} else {
+			let responseReplacementsText = "";
+			for (let i = 0; i < selectDayReplacements.length; i++) {
+				const replacement = selectDayReplacements[i];
+				responseReplacementsText += `Замена #${Number(i) + 1}:
+Пара: ${replacement.lessonNum}
+Заменяемая пара: ${replacement.oldLessonName}
+Преподаватель: ${replacement.oldLessonTeacher}
+Новая пара: ${replacement.newLessonName}
+Преподаватель на новой паре: ${replacement.newLessonTeacher}
+Добавлена на сайт: ${moment(replacement.addToSite).format(
+					"HH:mm:ss | DD.MM.YYYY",
+				)}
+Обнаружена ботом: ${moment(replacement.detected).format(
+					"HH:mm:ss | DD.MM.YYYY",
+				)}\n\n`;
+			}
+			return await message.sendMessage(
+				`на выбранный день ${selectedDate.format("DD.MM.YYYY")} для группы ${
+					groupData.name
+				} ${utils.string.declOfNum(selectDayReplacements.length, [
+					"найдена",
+					"найдено",
+					"найдено",
+				])} ${
+					selectDayReplacements.length
+				} ${utils.string.declOfNum(selectDayReplacements.length, [
+					"замена",
+					"замены",
+					"замен",
+				])}:\n\n${responseReplacementsText}`,
+				{ reply_markup: InlineKeyboard.keyboard(responseKeyboard) },
+			);
+		}
 	},
 );

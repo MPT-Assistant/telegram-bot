@@ -309,13 +309,13 @@ export default class MPT {
 			InlineKeyboard.textButton({
 				text: "Вчера",
 				payload: `com=${command}&date=${moment()
-					.add(1, "day")
+					.subtract(1, "day")
 					.format("DD.MM.YYYY")}`,
 			}),
 			InlineKeyboard.textButton({
-				text: "Вчера",
+				text: "Завтра",
 				payload: `com=${command}&date=${moment()
-					.subtract(1, "day")
+					.add(1, "day")
 					.format("DD.MM.YYYY")}`,
 			}),
 		]);
