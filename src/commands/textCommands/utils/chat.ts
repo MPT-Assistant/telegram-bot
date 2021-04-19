@@ -18,7 +18,7 @@ new TextCommand(/^(?:чат)$/i, ["Чат"], async (message) => {
 					text: `${
 						message.db.chat.data.inform ? "Отключить" : "Включить"
 					} уведомления`,
-					payload: `com=inform&status=${!message.db.chat.data.inform}`,
+					payload: `com=informChat&status=${!message.db.chat.data.inform}`,
 				}),
 			]),
 		},

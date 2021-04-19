@@ -5,3 +5,4 @@ import "./MPT/regchat";
 
 import "./utils/about";
 import "./utils/chat";
+import "./utils/profile";
