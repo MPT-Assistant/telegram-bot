@@ -80,8 +80,16 @@ telegram.updates.on(
 			}
 			return;
 		} catch (err) {
-			console.log(err);
-			await context.sendMessage(`ошиб очка.`);
+			if (err.message.includes("message is not modified")) {
+				await context.answerCallbackQuery({
+					text: `Ничего не изменилось ¯\\_(ツ)_/¯`,
+				});
+			} else {
+				console.log(err);
+				await context.answerCallbackQuery({
+					text: `ошиб очка`,
+				});
+			}
 		}
 	},
 );
