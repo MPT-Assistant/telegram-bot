@@ -69,14 +69,14 @@ new TextCommand(
 				break;
 			case /([\d]+)?(.)?([\d]+)?(.)?([\d]+)/.test(message.args[1]): {
 				const splittedMessageArgument = message.args[1].split(".");
-				const currentSplittedDate = moment().format("DD.MM.YYYY");
+				const currentSplittedDate = moment().format("DD.MM.YYYY").split(".");
 				splittedMessageArgument[0] =
 					splittedMessageArgument[0] || currentSplittedDate[0];
 				splittedMessageArgument[1] =
 					splittedMessageArgument[1] || currentSplittedDate[1];
 				splittedMessageArgument[2] =
 					splittedMessageArgument[2] || currentSplittedDate[2];
-				selectedDate = moment(splittedMessageArgument.reverse().join("-"));
+				selectedDate = moment(splittedMessageArgument.join("."), "DD.MM.YYYY");
 				break;
 			}
 			default:
