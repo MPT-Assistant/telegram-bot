@@ -3,7 +3,7 @@ import InternalUtils from "../../../lib/utils/utils";
 
 import utils from "rus-anonym-utils";
 import { InlineKeyboard } from "puregram";
-import { InlineKeyboardTextButton } from "puregram/lib/interfaces";
+import { TelegramInlineKeyboardButton } from "puregram/lib/telegram-interfaces";
 
 new TextCommand(
 	/(?:установить группу|уг)(?:\s(.*))?$/i,
@@ -40,7 +40,7 @@ new TextCommand(
 				return 0;
 			});
 			let responseText = `\nВозможно вы имели в виду какую то из этих групп:`;
-			const responseKeyboard: InlineKeyboardTextButton[] = [];
+			const responseKeyboard: TelegramInlineKeyboardButton[] = [];
 			for (let i = 0; i < 3; i++) {
 				responseText += `\n${i + 1}. ${diff[i].group}`;
 				responseKeyboard.push(

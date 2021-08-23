@@ -7,3 +7,4 @@ import "./utils/about";
 import "./utils/chat";
 import "./utils/profile";
 import "./utils/mailing";
+import "./utils/help";

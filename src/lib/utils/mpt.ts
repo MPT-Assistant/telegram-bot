@@ -14,7 +14,7 @@ import {
 	Group,
 } from "../../typings/mpt";
 import utils from "./utils";
-import { InlineKeyboardTextButton } from "puregram/lib/interfaces";
+import { TelegramInlineKeyboardButton } from "puregram/lib/telegram-interfaces";
 
 type MPT_Data = {
 	week: Week;
@@ -239,7 +239,7 @@ export default class MPT {
 
 	public generateKeyboard(
 		command: "lessons" | "replacements",
-	): InlineKeyboardTextButton[][] {
+	): TelegramInlineKeyboardButton[][] {
 		const DayTemplates: RegExp[] = [
 			/воскресенье|вс/,
 			/понедельник|пн/,
@@ -273,7 +273,7 @@ export default class MPT {
 			return moment(targetDate).format("DD.MM.YYYY");
 		};
 
-		const responseKeyboard: InlineKeyboardTextButton[][] = [];
+		const responseKeyboard: TelegramInlineKeyboardButton[][] = [];
 
 		responseKeyboard.push([
 			InlineKeyboard.textButton({

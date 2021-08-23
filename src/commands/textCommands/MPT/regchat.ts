@@ -1,9 +1,9 @@
 import { InlineKeyboard } from "puregram";
+import { TelegramInlineKeyboardButton } from "puregram/lib/telegram-interfaces";
 import utils from "rus-anonym-utils";
 
 import TextCommand from "../../../lib/utils/textCommand";
 import InternalUtils from "../../../lib/utils/utils";
-import { InlineKeyboardTextButton } from "puregram/lib/interfaces";
 
 new TextCommand(
 	/(?:regchat|привязать)(?:\s(.*))?$/i,
@@ -44,7 +44,7 @@ new TextCommand(
 				return 0;
 			});
 			let responseText = `\nВозможно вы имели в виду какую то из этих групп:`;
-			const responseKeyboard: InlineKeyboardTextButton[] = [];
+			const responseKeyboard: TelegramInlineKeyboardButton[] = [];
 			for (let i = 0; i < 3; i++) {
 				responseText += `\n${i + 1}. ${diff[i].group}`;
 				responseKeyboard.push(
