@@ -1,5 +1,5 @@
 import { Telegram } from "puregram";
-import { TelegramMessage } from "puregram/lib/interfaces";
+import { TelegramMessage } from "puregram/lib/telegram-interfaces";
 
 import config from "../../DB/config.json";
 
